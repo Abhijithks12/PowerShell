@@ -130,7 +130,7 @@ get-timezone
 
 7.Create new contact
 
-New-ADObject -Type contact -name Sanatsatish.Sharma -Path "OU=Contacts,OU=Users,OU=User Workspace,DC=news,DC=newslimited,DC=local"
+New-ADObject -Type contact -name Sanatsatish.Shiarma -Path "OU=Contacts,OU=Users,OU=Us,DC=news,DC=nd,DC=lc"
 
  
 
@@ -152,7 +152,7 @@ get-vm | % { get-view $_.id } | select Name, @{ Name="ToolsVersion"; Expression=
 
 Script :
 
-$servers = "GIOSPROD01","GIOSPROD02","NSGSHSDS01V","NSGSHSSWS10V","NSGSHSSWS11V","NSGSHSSWS12V"
+$servers = "ser1","ser1","ser1","ser1","ser1","ser1"
 
 $currentdate = Get-Date
 
@@ -217,7 +217,7 @@ $multiplemachines |ft -AutoSize
 
 Script :
 
-Get-ADGroupMember -Identity 'RGRP_PowerBI_ClientServicesReportDeveloper' -Recursive |
+Get-ADGroupMember -Identity 'adgroup' -Recursive |
 
 Select-Object -Unique |
 
@@ -225,7 +225,7 @@ Get-ADUser -Properties Mail |
 
 Select-Object Name, Mail |
 
-Export-Csv -Path 'E:\abhijith\RGRP_PowerBI_ClientServicesReportDeveloper1' -NoTypeInformation
+Export-Csv -Path 'E:\abhijith\adgroup' -NoTypeInformation
 
  
 
@@ -249,7 +249,7 @@ Import-module servermanager ; Get-WindowsFeature | where-object {$_.Installed -e
 
 
 
-$s = "LDAP://" + (Get-ADGroup "AGRP_NCA_SalesViewer").DistinguishedName
+$s = "LDAP://" + (Get-ADGroup "adgroup").DistinguishedName
 
 ([ADSI]$s).member
 
@@ -261,7 +261,7 @@ $s = "LDAP://" + (Get-ADGroup "AGRP_NCA_SalesViewer").DistinguishedName
 
  
 
-Get-WmiObject -Class Win32_Product -computername "shsjump01" | select-object __server, name, version -erroraction silentlycontinue
+Get-WmiObject -Class Win32_Product -computername "srver01" | select-object __server, name, version -erroraction silentlycontinue
 
  
 
@@ -273,7 +273,7 @@ Get-WmiObject -Class Win32_Product -computername "shsjump01" | select-object __s
 
  
 
-Get-ADPrincipalGroupMembership -Identity majeedn| Format-Table -Property name
+Get-ADPrincipalGroupMembership -Identity usrc| Format-Table -Property name
 
  
 
@@ -285,7 +285,7 @@ Get-ADPrincipalGroupMembership -Identity majeedn| Format-Table -Property name
 
  
 
-Get-ADGroupMember -Identity 'DGRP_KMH_T_NEWSAUS_SA' | Select-Object name,Samaccountname
+Get-ADGroupMember -Identity 'adgroup' | Select-Object name,Samaccountname
 
  
 
@@ -298,7 +298,7 @@ Get-ADGroupMember -Identity 'DGRP_KMH_T_NEWSAUS_SA' | Select-Object name,Samacco
 
 
 
-$users =get-adgroupmember -identity 'RGRP_SHS_National CI'
+$users =get-adgroupmember -identity 'Radgroupional CI'
 
 $users.count
 
@@ -319,7 +319,7 @@ ForEach ($item in (Import-CSV C:\Scripts\DLMembers1.csv)) {
 
   Get-ADUser -Filter "mail -eq '$email'" | 
 
-  % { Add-ADGroupMember -Identity "RGRP_Okta_NRMCMS" -Members $_ }
+  % { Add-ADGroupMember -Identity "adgroup" -Members $_ }
 
 }
 
@@ -332,7 +332,7 @@ ForEach ($item in (Import-CSV C:\Scripts\DLMembers1.csv)) {
 
 
 
-Get-AdGroupMember -identity "News_Storage_Admins" | Select-Object name
+Get-AdGroupMember -identity "adgroup" | Select-Object name
 
  
 
@@ -358,7 +358,7 @@ get-aduser sivadasa  -properties * | select-object Name, SAMaccountName, EmailAd
 
  
 
-Get-WmiObject -Class Win32_Product -Computer yansccmdp01 | Where-Object { $_.Name -like "vmware tools" }
+Get-WmiObject -Class Win32_Product -Computer server01 | Where-Object { $_.Name -like "vmware tools" }
 
 ===========================================================
 21. View a specific software version on a list of  remote computer 
@@ -432,3 +432,36 @@ $driveinfo | ConvertTo-HTML -head $style | Out-File $exportPath\Server_Drivespac
  
 
 ===================================
+
+
+25.script to get sam account name ,
+
+step: 1
+
+Get-ADGroupMember -Identity 'adgroup' | Select-Object name,Samaccountname |
+Export-Csv E:\abhijith\scriptop\adgroup.csv
+
+============================================================
+
+26.step: 2
+
+Copy the sam account name from "E:\abhijith\scriptop\adgroup.csv" to E:\Abhijith\scriptop\saminput.txt
+
+=============================================================
+
+script to get Job tittle of users from the sam account input
+
+27.step: 3
+
+$user = Get-Content E:\Abhijith\scriptop\saminput.txt
+
+$r= foreach($u in $user){
+
+Get-ADUser -Identity $u -Properties * | select Name,Title
+
+}
+
+$r | Export-csv E:\abhijith\scriptop\adgroup.csv -UseCulture -NoTypeInformation
+
+================================================
+
