@@ -1,0 +1,434 @@
+
+1.Add multiple users to multiple ad groups,
+
+Create a csv like below,
+
+user2multipleadgroups.csv
+
+Username,groupname
+
+user1,group1
+
+Script :
+
+import-csv C:\Temp\user2multipleadgroups.csv | ForEach-Object {Add-ADGroupMember -Identity $_.Groupname -Members $_.Username}
+
+=======================================
+
+ 
+
+2.Compare ad group membership of 2 users
+
+
+Script :
+
+$FirstUser = Read-Host "sxsds"
+
+$SecondUser = Read-Host "rsdjsa"
+
+
+
+
+$FirstUGM = (get-aduser $firstuser -Properties memberof).memberof
+
+$SecondUGM = (get-aduser $SecondUser -Properties memberof).memberof
+
+
+
+
+foreach ($F in $FirstUGM)
+
+{
+
+    $FGroupName = (get-adobject $F).name
+
+    $Matched = $False
+
+    foreach ($S in $SecondUGM)
+
+    {
+
+        $SGroupName = (get-adobject $S).name
+
+        if ($FGroupName -eq $SGroupName){$Matched = $True;break}
+
+    }
+
+    if ($Matched -eq $False){write-host "$SecondUser is not a member of $FGroupName"}
+
+}
+
+==================================================
+
+3.To get computer sid ,id 
+
+
+Command:
+
+ Get-adcomputer -id "EXXSASASA"
+
+ 
+
+===================================================
+
+ 
+
+4.To delete computer objects from list
+
+Script :
+
+$File = "c:\temp\todelete.txt"
+
+
+
+
+ForEach ($Computer in (Get-Content $File))
+
+{   Try {
+
+        Remove-ADComputer $Computer -ErrorAction Stop
+
+        Add-Content c:\Scripts\remove-mycomputers.log -Value "$Computer removed"
+
+    }
+
+    Catch {
+
+        Add-Content c:\Scripts\remove-mycomputers.log -Value "$Computer not found because $($Error[0])"
+
+    }
+
+}
+
+
+
+
+=====================================================
+
+ 
+
+5.Create ad group in an OU with description
+
+
+Script :
+
+New-ADGroup -Name "gROUP NAME" -GroupCategory Security -GroupScope Global -Path "OU=XX,OU=XX,OU=XX,OU=XX,DC=XX,DC=XX,DC=XX" -Description "649821752704 - nca-advertising-prod-amap-nct-readonly"
+
+===================================================
+
+ 
+
+6.Set time on a Computer
+
+Set-TimeZone -id "AUS Eastern Standard Time" -passthru
+
+To view time zone
+
+get-timezone
+
+=====================================================
+
+7.Create new contact
+
+New-ADObject -Type contact -name Sanatsatish.Sharma -Path "OU=Contacts,OU=Users,OU=User Workspace,DC=news,DC=newslimited,DC=local"
+
+ 
+
+=====================================================
+
+ 
+
+8.To get vm ware tools version Power cli
+
+ 
+
+get-vm | % { get-view $_.id } | select Name, @{ Name="ToolsVersion"; Expression={$_.config.tools.toolsVersion}},@{ Name="ToolStatus"; Expression={$_.Guest.ToolsVersionStatus}},@{N="Configured OS";E={$_.Config.GuestFullName}}| Export-CSV "e:\abhijith\vmware tools\vmc27.csv"
+
+====================================================
+
+ 
+
+9.Check Uptime of servers
+
+Script :
+
+$servers = "GIOSPROD01","GIOSPROD02","NSGSHSDS01V","NSGSHSSWS10V","NSGSHSSWS11V","NSGSHSSWS12V"
+
+$currentdate = Get-Date
+
+foreach($server in $servers){
+
+$Bootuptime = (Get-CimInstance -ClassName Win32_OperatingSystem -ComputerName $server).LastBootUpTime
+
+   $uptime = $currentdate - $Bootuptime
+
+   Write-Output "$server Uptime : $($uptime.Days) Days, $($uptime.Hours) Hours, $($uptime.Minutes) Minutes"
+
+}
+
+ 
+
+OR
+
+ 
+
+function get-uptime {
+param(
+$computername =$env:computername
+)
+$osname = Get-WmiObject win32_operatingsystem -ComputerName $computername -ea silentlycontinue
+if($osname)
+{
+$lastbootuptime =$osname.ConvertTodateTime($osname.LastBootUpTime)
+$LocalDateTime =$osname.ConvertTodateTime($osname.LocalDateTime)
+$up =$LocalDateTime - $lastbootuptime
+$uptime ="$($up.Days) days, $($up.Hours)h, $($up.Minutes)mins"
+$output =new-object psobject
+$output |Add-Member noteproperty LastBootUptime $LastBootuptime
+$output |Add-Member noteproperty ComputerName $computername
+$output |Add-Member noteproperty uptime $uptime
+$output | Select-Object computername,LastBootuptime,Uptime
+}
+else
+{
+$output =New-Object psobject
+$output =new-object psobject
+$output |Add-Member noteproperty LastBootUptime "Not Available"
+$output |Add-Member noteproperty ComputerName $computername
+$output |Add-Member noteproperty uptime "Not Available"
+$output | Select-Object computername,LastBootUptime,Uptime
+}
+}
+get-uptime
+$multiplemachines =@()
+$allserver =Get-Content -Path "C:\Temp\PSSCRIPTS\serveruptime.txt"
+foreach($oneserver in $allserver)
+{
+$multiplemachines += get-uptime $oneserver
+}
+$multiplemachines |ft -AutoSize
+
+========================================================
+
+ 
+
+10.To get ad group members with email and username
+
+
+Script :
+
+Get-ADGroupMember -Identity 'RGRP_PowerBI_ClientServicesReportDeveloper' -Recursive |
+
+Select-Object -Unique |
+
+Get-ADUser -Properties Mail |
+
+Select-Object Name, Mail |
+
+Export-Csv -Path 'E:\abhijith\RGRP_PowerBI_ClientServicesReportDeveloper1' -NoTypeInformation
+
+ 
+
+===========================================================
+
+ 
+
+11.To view installed roles and features 
+
+
+Import-module servermanager ; Get-WindowsFeature | where-object {$_.Installed -eq $True} |format-list DisplayName
+
+ 
+
+============================================================
+
+ 
+
+12.View members of Domain local AD group.
+
+
+
+
+$s = "LDAP://" + (Get-ADGroup "AGRP_NCA_SalesViewer").DistinguishedName
+
+([ADSI]$s).member
+
+==========================================================
+
+ 
+
+13.To get list of installed apps on a server 
+
+ 
+
+Get-WmiObject -Class Win32_Product -computername "shsjump01" | select-object __server, name, version -erroraction silentlycontinue
+
+ 
+
+==============================================================
+
+ 
+
+14.View ad group membership of user
+
+ 
+
+Get-ADPrincipalGroupMembership -Identity majeedn| Format-Table -Property name
+
+ 
+
+============================================================
+
+ 
+
+ 15.To get the SAM account name for an AD group members
+
+ 
+
+Get-ADGroupMember -Identity 'DGRP_KMH_T_NEWSAUS_SA' | Select-Object name,Samaccountname
+
+ 
+
+=============================================================
+
+ 
+
+16.To get count of ad group
+
+
+
+
+$users =get-adgroupmember -identity 'RGRP_SHS_National CI'
+
+$users.count
+
+ 
+
+===========================================================
+
+ 
+
+17.DL email addition
+
+
+Script :
+
+ForEach ($item in (Import-CSV C:\Scripts\DLMembers1.csv)) {
+
+  $email = $item.'Email' #whatever your field name
+
+  Get-ADUser -Filter "mail -eq '$email'" | 
+
+  % { Add-ADGroupMember -Identity "RGRP_Okta_NRMCMS" -Members $_ }
+
+}
+
+=========================================================
+
+ 
+
+18.To get ad group members list
+
+
+
+
+Get-AdGroupMember -identity "News_Storage_Admins" | Select-Object name
+
+ 
+
+5000 members
+
+ 
+
+$users = Get-ADGroupMember -Identity ‘gapps_s3’
+
+$users | ft name
+
+=========================================================
+
+19.View Unix attributes of a user
+
+get-aduser sivadasa  -properties * | select-object Name, SAMaccountName, EmailAddress,Enabled,WhenCreated,uidnumber,uid,gidnumber,loginshell,Unixhomedirectory
+
+ 
+
+========================================================
+
+20. View a specific software version on remote computer 
+
+ 
+
+Get-WmiObject -Class Win32_Product -Computer yansccmdp01 | Where-Object { $_.Name -like "vmware tools" }
+
+===========================================================
+21. View a specific software version on a list of  remote computer 
+
+
+$pcnames = Import-Csv -Path "C:\temp\psscripts\swversiononservers.csv"
+$pcnames = $pcnames.ComputerName
+foreach ($pcname in $pcnames){
+$pcname;
+Get-WmiObject Win32_Product -ComputerName $pcname | Where-Object { $_.Name -like "vmware tools" } | Format-List -Property PSComputerName, Name, version
+}
+
+=====================================================
+
+22. User email to sam account name
+
+ 
+
+Get-Content "C:\temp\psscripts\usersemailinput.txt" | ForEach-Object {
+$mail = $_
+$user = Get-ADUser -LDAPFilter "(mail=$mail)"
+if ( $user ) {
+$sAMAccountName = $user.sAMAccountName
+}
+else {
+$sAMAccountName = $null
+}
+[PSCustomObject] @{
+"mail" = $mail
+"sAMAccountName" = $sAMAccountName
+}
+}
+
+===========================================================
+23. Set DNS server in DHCP scope options (Option 006)
+
+ 
+
+Set-DhcpServerv4OptionValue -ComputerName dhcpserver01 -ScopeId 10.xx.xx.xx -DnsServer 10.xx.xx.xx,10.xx.xx.xx
+
+===========================================================
+
+24. To check last password of a user
+
+get-aduser -identity sivadasa -properties passwordlastset | ft Name, passwordlastset
+
+==============================================================
+
+24. To check disk space of servers with percentage.
+
+ 
+
+Change the $exportpath to whatever path you want the html and CSV files in.
+$exportPath = "C:\Temp\PSSCRIPTS" # I change this to a central fileshare
+
+Your computers.txt will need to be in this folder.
+$computers = Get-Content "C:\Temp\PSSCRIPTS\drive_info_computers.txt"
+$driveinfo = Get-WMIobject win32_LogicalDisk -ComputerName $computers -filter "DriveType=3" |
+Select-Object SystemName, DeviceID, VolumeName,
+@{Name="Size(GB)"; Expression={"{0:N1}" -f($.size/1gb)}},
+@{Name="FreeSpace(GB)"; Expression={"{0:N1}" -f($.freespace/1gb)}},
+@{Name="% FreeSpace(GB)"; Expression={"{0:N2}%" -f(($.freespace/$.size)*100)}},
+@{Name="Date"; Expression={$(Get-Date -format 'g')}}
+
+Various Output Options
+$driveinfo | Out-GridView
+$driveinfo | Format-Table -AutoSize
+$driveinfo | Export-Csv "$exportPath\Server_Drivespace.csv" -NoTypeInformation -NoClobber -Append
+$driveinfo | ConvertTo-HTML -head $style | Out-File $exportPath\Server_Drivespace.htm -NoClobber -Append
+
+ 
+
+===================================
