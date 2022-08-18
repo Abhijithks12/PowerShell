@@ -449,9 +449,9 @@ Copy the sam account name from "E:\abhijith\scriptop\adgroup.csv" to E:\Abhijith
 
 =============================================================
 
-script to get Job tittle of users from the sam account input
+27.script to get Job tittle of users from the sam account input
 
-27.step: 3
+step: 3
 
 $user = Get-Content E:\Abhijith\scriptop\saminput.txt
 
@@ -464,4 +464,28 @@ Get-ADUser -Identity $u -Properties * | select Name,Title
 $r | Export-csv E:\abhijith\scriptop\adgroup.csv -UseCulture -NoTypeInformation
 
 ================================================
+28. Get ad groups names starts with 
 
+Get-ADGroup -Filter {Name -like 'rgrp_power*'}  -Properties * | select -property name,info
+
+
+=================================================
+
+29.Add Notes to an AD group
+
+$group = Get-AdGroup -Identity "RgegsGROUP" -Properties info
+$notes = $group.info
+$notes += "Do not include this group when cloning user group memberships."
+Set-AdGroup $group -Replace @{info = $notes}
+==================================================
+
+30. To check installed patches on remote servers
+
+Param(
+$Computername = (Get-Content -path "C:\temp\psscripts\diskclear.txt"))
+foreach($Computer in $ComputerName){
+
+Get-HotFix -ErrorAction SilentlyContinue | Ft -AutoSize
+} 
+
+=============================================
