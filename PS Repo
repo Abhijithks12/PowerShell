@@ -494,3 +494,49 @@ get-scomalert | where-object { $_.name  -eq 'disk free space is low' -and $_.Res
 
 
 ======================================
+
+
+1
+
+There are many ways to solve this problem. One way is to load both files into variables, then use the String.Replace() Method to replace **** COPY DATA HERE **** from the 2nd file by the content of the 1st file. Save the variable that contains the merged content to a new file or overwrite the existing file.
+
+In the following code I've opted to create a new file "merged.txt".
+
+# Load file text1.txt into variable $text1
+$text1 = Get-Content text1.txt -Raw
+
+# Load file text2.txt into variable $text2
+$text2 = Get-Content text2.txt -Raw
+
+# Replace the given text in $text2 by $text1
+$text2 = $text2.Replace('**** COPY DATA HERE ****', $text1)
+
+# Save the variable $text2 into file merged.txt
+$text2 | Set-Content merged.txt
+Example:
+
+Given that "text1.txt" contains:
+
+This is the text 
+to be copied into the 2nd file.
+and "text2.txt" contains:
+
+existing data
+**** COPY DATA HERE ****
+more existing data
+After running the above script, "merged.txt" will be:
+
+existing data
+This is the text 
+to be copied into the 2nd file.
+more existing data
+Notes:
+
+The Get-Content parameter -Raw is used to load both files as a single, multiline string, so the .Replace() method can work on the whole text. By default Get-Content would split the text into individual lines, so the variables would be arrays of strings. While this can be useful, it is not really necessary in this case, so I disabled this behaviour by passing -Raw.
+While the above script works for simple text files, you also mentioned YAML files. In this case matters are more complicated, because the inserted data has to match the indentation of the insert position. It would be hard to give a correct solution for all possible cases. If you need assistance for YAML files I suggest you provide sample input and expected output.
+==================================================
+
+
+Get-Content in.txt | Where-Object { $_ -match "started processing" -or $_ -match "file" } >> out.txt
+
+===============================================
