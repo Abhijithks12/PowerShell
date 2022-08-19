@@ -489,3 +489,8 @@ Get-HotFix -ErrorAction SilentlyContinue | Ft -AutoSize
 } 
 
 =============================================
+
+get-scomalert | where-object { $_.name  -eq 'disk free space is low' -and $_.ResolutionState -eq “0”  } | Select-Object PrincipalName | Out-File 'C:\temp\PSSCRIPTS\DiskAlertsList.txt'
+
+
+======================================
