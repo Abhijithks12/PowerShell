@@ -547,3 +547,12 @@ Get alerts from scom with all properties
 get-scomalert | where-object {​ $_.name-eq 'disk free space is low' -and $_.ResolutionState -eq “0”}​ |fl *
 
 =========================================================
+
+Get certificate scom alerts,
+'
+ $inputScomMS = 'scomprod01.news.newslimited.local'
+Import-Module -Name "OperationsManager"
+New-SCManagementGroupConnection -ComputerName $inputScomMS
+get-scomalert | where-object { $_.name  -eq 'Certificate lifespan alert' -and $_.ResolutionState -eq “0”   }| Select-Object PrincipalName,Description | Out-File c:\temp\abhi\certalerts.txt
+
+======================================
