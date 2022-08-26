@@ -540,3 +540,10 @@ While the above script works for simple text files, you also mentioned YAML file
 Get-Content in.txt | Where-Object { $_ -match "started processing" -or $_ -match "file" } >> out.txt
 
 ===============================================
+
+
+Get alerts from scom with all properties
+
+get-scomalert | where-object {​ $_.name-eq 'disk free space is low' -and $_.ResolutionState -eq “0”}​ |fl *
+
+=========================================================
