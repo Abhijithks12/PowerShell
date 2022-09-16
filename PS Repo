@@ -556,3 +556,8 @@ New-SCManagementGroupConnection -ComputerName $inputScomMS
 get-scomalert | where-object { $_.name  -eq 'Certificate lifespan alert' -and $_.ResolutionState -eq “0”   }| Select-Object PrincipalName,Description | Out-File c:\temp\abhi\certalerts.txt
 
 ======================================
+
+
+find ou
+
+Get-Content c:\temp\psscripts\servicereboot.txt | ForEach-Object {Get-ADComputer $_} | select DistinguishedName
