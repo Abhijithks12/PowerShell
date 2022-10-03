@@ -561,3 +561,21 @@ get-scomalert | where-object { $_.name  -eq 'Certificate lifespan alert' -and $_
 find ou
 
 Get-Content c:\temp\psscripts\servicereboot.txt | ForEach-Object {Get-ADComputer $_} | select DistinguishedName
+
+=====================================
+$inputScomMS = 'scommgtserver01.domain.in'
+Import-Module -Name "OperationsManager"
+
+$server = 'testserver1.domain.in'
+
+$instance = (get-scomclass -DisplayName “Windows Computer” |Get-SCOMClassInstance | ? { $_.DisplayName -eq $server } )
+
+# Set time for 6 minutes
+
+$Time = (Get-Date).addMinutes(30)
+
+Start-SCOMMaintenanceMode -Instance $Instance -EndTime $Time -Comment “Starting Maintenance Mode.” -Reason “PlannedOther”
+
+====================================
+
+
