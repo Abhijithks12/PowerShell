@@ -738,7 +738,42 @@ Send-MailMessage @mailParams
 
 ==================================
 
+# Specify the path to the input text file containing Common Names (CN)
+$inputFilePath = "C:\Temp\PSSCRIPTS\dadisplayname.txt"
 
+# Read the contents of the input file (each line represents a Common Name (CN))
+$cns = Get-Content -Path $inputFilePath
+
+# Initialize an empty array to store the results
+$results = @()
+
+# Iterate over each Common Name (CN)
+foreach ($cn in $cns) {
+    # Retrieve the SAM account name for the current Common Name (CN)
+    $user = Get-ADUser -Filter {CN -eq $cn} -Properties sAMAccountName
+
+    # Check if the user is found
+    if ($user) {
+        $samAccountName = $user.sAMAccountName
+        $result = [PSCustomObject]@{
+            CN = $cn
+            SAMAccountName = $samAccountName
+        }
+        $results += $result
+    } else {
+        Write-Host "User with Common Name (CN) '$cn' not found."
+    }
+}
+
+# Display the results
+$results | Format-Table -AutoSize
+
+# Export the results to a text file
+$outputFilePath = "C:\Temp\PSSCRIPTS\dasam.txt"
+$results | Out-File -FilePath $outputFilePath
+
+Write-Host "Output exported to $outputFilePath."
+==============================
 
 
 
