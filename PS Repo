@@ -577,5 +577,177 @@ $Time = (Get-Date).addMinutes(30)
 Start-SCOMMaintenanceMode -Instance $Instance -EndTime $Time -Comment “Starting Maintenance Mode.” -Reason “PlannedOther”
 
 ====================================
+52. Get SAMACCOUNT name from display name for a group of users
+
+# Specify the path to the input text file containing display names
+$inputFilePath = "C:\Temp\PSSCRIPTS\dadisplayname.txt"
+
+# Specify the path to the output text file to store the SAM account names
+$outputFilePath = "C:\Temp\PSSCRIPTS\dasam.txt"
+
+# Read the contents of the input file (each line represents a display name)
+$displayNames = Get-Content -Path $inputFilePath
+
+# Initialize an empty array to store the results
+$results = @()
+
+# Iterate over each display name
+foreach ($displayName in $displayNames) {
+    # Retrieve the SAM account name for the current display name
+    $user = Get-ADUser -Filter {DisplayName -eq $displayName} -Properties sAMAccountName
+
+    # Check if the user is found
+    if ($user) {
+        $samAccountName = $user.sAMAccountName
+        $result = [PSCustomObject]@{
+            DisplayName = $displayName
+            SAMAccountName = $samAccountName
+        }
+        $results += $result
+    } else {
+        Write-Host "User with display name '$displayName' not found."
+    }
+}
+
+# Export the results to the output file
+$results | Export-Csv -Path $outputFilePath -NoTypeInformation
+
+Write-Host "Output exported to $outputFilePath."
+
+================================================
+# Specify the display name for which you want to retrieve the SAM account name
+$displayName = "Adm_Mikael Nedegard"
+
+# Retrieve the SAM account name for the given display name
+$user = Get-ADUser -Filter {DisplayName -eq $displayName} -Properties sAMAccountName
+
+# Check if the user is found
+if ($user) {
+    $samAccountName = $user.sAMAccountName
+    Write-Host "SAM Account Name for '$displayName': $samAccountName"
+} else {
+    Write-Host "User with display name '$displayName' not found."
+}
+
+===================================
+
+Test this.. 
+# Define the list of users to remove
+$usersToRemove = @("User1", "User2", "User3")
+
+# Define the list of groups to remove the users from
+$groupsToRemoveFrom = @("Group1", "Group2", "Group3")
+
+# Iterate over each user
+foreach ($user in $usersToRemove) {
+    # Iterate over each group
+    foreach ($group in $groupsToRemoveFrom) {
+        # Remove the user from the group
+        Remove-ADGroupMember -Identity $group -Members $user -Confirm:$false
+        Write-Host "Removed user $user from group $group"
+    }
+}
+
+Abhijith Sivadas, 30 min
+
+# Specify the path to the input text file
+$inputFilePath = "C:\Path\to\InputFile.txt"
+
+# Read the contents of the input file
+$inputContent = Get-Content -Path $inputFilePath
+
+# Iterate over each line in the input file
+foreach ($line in $inputContent) {
+    # Split the line into user and group using a delimiter (e.g., comma or tab)
+    $user, $group = $line -split ","
+
+    # Remove the user from the group
+    Remove-ADGroupMember -Identity $group.Trim() -Members $user.Trim() -Confirm:$false
+    Write-Host "Removed user $user from group $group"
+}
+==================================
+
+To find disabled date
+
+Username = "dareddym4" # Replace with the username you want to check
+
+$User = Get-ADUser -Identity $Username -Properties whenChanged
+
+if ($User.Enabled -eq $false) {
+    $DisabledDate = $User.whenChanged
+    Write-Host "The account '$Username' was disabled on $DisabledDate."
+} else {
+    Write-Host "The account '$Username' is currently enabled."
+}
+
+=================================
+
+Convert csv to html and send mail
+
+# Define email parameters
+$smtpServer = "smtp.news.newslimited.local"
+$fromEmail = "abhijith.sivadas@news.com.au"
+$toEmail = "abhijith.sivadas@news.com.au"
+$subject = "High Uptime Servers"
+
+# CSV file path
+$csvFilePath = "C:\Users\dasivadasa\Downloads\book2.csv"
+
+# Convert CSV to HTML table
+$csvData = Import-Csv -Path $csvFilePath
+$htmlTable = $csvData | ConvertTo-Html -Fragment
+
+# Create email body with HTML table content
+$body = @"
+<html>
+<head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: lightgray;
+    }
+</style>
+</head>
+<body>
+<h2>CSV to HTML Conversion</h2>
+$htmlTable
+</body>
+</html>
+"@
+
+# Create email message
+$mailParams = @{
+    SmtpServer = $smtpServer
+    From = $fromEmail
+    To = $toEmail
+    Subject = $subject
+    Body = $body
+    BodyAsHtml = $true
+}
+
+# Send email
+Send-MailMessage @mailParams
+
+==================================
+
+
+
+
+
+
+
+
+
+
+
+
 
 
