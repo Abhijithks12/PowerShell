@@ -1,0 +1,85 @@
+# Variables
+$taskName = "Disk Space Alert Check"
+$taskStatus = Get-ScheduledTask -TaskName $taskName | Select-Object -ExpandProperty State
+
+# Function to send an HTML email
+function Send-HTMLMail {
+    param(
+        [string]$to,
+        [string]$subject,
+        [string]$body
+    )
+
+    # HTML Styles
+    $htmlStyle = @"
+    <style>
+        table {
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            width: 50%;
+        }
+        
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        .highlight {
+            color: Red;
+            background-color: Yellow;
+        }
+    </style>
+"@
+
+    # HTML Table
+    $htmlTable = @"
+    <table>
+        <tr>
+            <th>Task Name</th>
+            <th>Task Status</th>
+        </tr>
+        <tr>
+            <td>$taskName</td>
+            <td class="highlight">$taskStatus</td>
+        </tr>
+    </table>
+"@
+
+    # Send email
+    $smtpServer = "smtp.news.newslimited.local"
+    $from = "abhijith.sivadas@news.com.au"
+    $to = "abhijith.sivadas@news.com.au"
+    $body = "$htmlStyle$htmlTable$body"
+    $headers = @{
+        "Content-Type" = "text/html"
+    }
+
+    Send-MailMessage -SmtpServer $smtpServer -From $from -To $to -Subject $subject -Body $body -BodyAsHtml -Priority High -Encoding UTF8
+}
+
+# Check task status and save it to a log file
+if ($taskStatus -ne "Ready") {
+    # Define colors for highlighting
+    $foregroundColor = "Red"
+    $backgroundColor = "Yellow"
+
+    # Set console colors for highlighting
+    Write-Host ("Task Status: " + $taskStatus) -ForegroundColor $foregroundColor -BackgroundColor $backgroundColor
+
+    # Take additional actions or send notifications as needed
+    Write-Host "Task $taskName is in state $taskStatus."
+
+    # Send email with status
+    Send-HTMLMail -to "recipient@example.com" -subject "Task Status Report: $taskName" -body "Task $taskName is in state $taskStatus."
+} else {
+    # Display the status without highlighting
+    Write-Host "Task Status: $taskStatus"
+
+    # Send email with status
+    Send-HTMLMail -to "recipient@example.com" -subject "Task Status Report: $taskName" -body "Task Status: $taskStatus"
+}
