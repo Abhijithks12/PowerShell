@@ -776,7 +776,42 @@ Write-Host "Output exported to $outputFilePath."
 ==============================
 
 
+# Path to the input Notepad files
+$fileA = "C:\path\to\fileA.txt"
+$fileB = "C:\path\to\fileB.txt"
 
+# Path to the output Notepad file
+$outputFile = "C:\path\to\output.txt"
+
+# Read the content of file A and count the lines
+$contentA = Get-Content $fileA
+$countA = $contentA.Count
+
+# Read the content of file B and count the lines
+$contentB = Get-Content $fileB
+$countB = $contentB.Count
+
+# Initialize an array to store matching data
+$matchingData = @()
+
+# Loop through each line in file A
+foreach ($lineA in $contentA) {
+    # Check if the line from file A exists in file B
+    if ($contentB -contains $lineA) {
+        $matchingData += $lineA
+    }
+}
+
+# Write matching data to the output file
+$matchingData | Out-File -FilePath $outputFile
+
+# Output counts from each Notepad file
+Write-Host "Count from File A: $countA"
+Write-Host "Count from File B: $countB"
+
+# Output a message indicating completion
+Write-Host "Matching data has been written to $outputFile."
+========================================
 
 
 
